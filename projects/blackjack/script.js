@@ -61,8 +61,7 @@ function createDeck(){
         deck.push(cardObject)
       } 
   }
-  return deck;
-}
+  return deck;}
 function getNextCard(deck){
     return deck.shift();
   }
@@ -73,11 +72,9 @@ function shuffleDeck(deck){
     let tempCardHolder = deck[swapIndex];
     deck[swapIndex] = deck[currentIndex];
     deck[currentIndex] = tempCardHolder;
-  }
-}
+  }}
 function getCardString(cardObject){
-    return cardObject.value + " of " + cardObject.suit;
-}
+    return cardObject.value + " of " + cardObject.suit;}
 function getCardValue(cardObject){
   let value = 0;
   switch(cardObject.value){
@@ -112,8 +109,7 @@ function getCardValue(cardObject){
       value = 10;
       break;
   }
-  return value;
-}
+  return value;}
 function getScore(cardObjectArray){
   let score = 0;
   for(let i = 0; i < cardObjectArray.length; i++){
@@ -126,12 +122,10 @@ function getScore(cardObjectArray){
       score += getCardValue(cardObjectArray[i]);
     }
   }
-  return score;
-}
+  return score;}
 function updateScores(){
   dealerScore = getScore(dealerCards);
-  playerScore = getScore(playerCards);
-}
+  playerScore = getScore(playerCards);}
 function updateGameStatus(){
   let dealerCardString = "";
   let playerCardString = "";
@@ -147,10 +141,9 @@ function updateGameStatus(){
   textArea.innerText += "(Score: " + dealerScore + ")\n\n"
   textArea.innerText += "Player has:" + "\n";
   textArea.innerText += playerCardString;
-  textArea.innerText += "(Score: " + playerScore + ")\n\n"
-}
+  textArea.innerText += "(Score: " + playerScore + ")\n\n"}
 function checkForEndOfGame(){
-  if(playerScore == 21){
+  if(playerScore === 21){
     gameOver = true;
   }
   
@@ -167,14 +160,14 @@ function checkForEndOfGame(){
   {
     playerWon = false;
     gameOver = true;
-    textArea.innerText += "BUST! YOU LOSE!"
+    textArea.innerText += "YOU LOSE! BUST!"
     resetButtons();
   }
   else if (dealerScore > 21)
   {
     playerWon = true;
     gameover = true;
-    textArea.innerText += "DEALER BUSTS! YOU WIN!"
+    textArea.innerText += "YOU WIN! DEALER BUSTS!"
     resetButtons();
   }
   else if (gameOver)
@@ -183,7 +176,7 @@ function checkForEndOfGame(){
     {
     playerWon = false;
     gameOver = true;
-    textArea.innerText += "TIE!"
+    textArea.innerText += "PUSH!"
     resetButtons();
     }
     else if(playerScore > dealerScore)
@@ -197,13 +190,11 @@ function checkForEndOfGame(){
       textArea.innerText += "YOU LOSE!"
     }
     resetButtons();
-  }
-}
+  }}
 function resetButtons(){
   hitButton.style.display = 'none';
   stayButton.style.display = 'none';
-  newGameButton.style.display = 'inline';
-}
+  newGameButton.style.display = 'inline';}
 
 
 
