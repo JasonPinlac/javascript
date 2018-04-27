@@ -6,11 +6,11 @@ const startButton = document.getElementById('start-button');
 const stopButton = document.getElementById('stop-button');
 const resetButton = document.getElementById('reset-button');
 
-// Initial setup
-feedbackArea.style.display = 'none';
-
 // Global Variables
 let stopwatch = new Stopwatch();
+
+// Initial setup
+feedbackArea.style.display = 'none';
 
 // Events
 startButton.addEventListener('click', function(){
@@ -34,14 +34,17 @@ resetButton.addEventListener('click', function(){
 // Constructor Function
 function Stopwatch(){
     // private properties
-    let _startTime = null, _stopTime = null, _timeElapsed = 0, _totalTimeElapsed = 0, _isRunning = false;
-
+    let _isRunning = false;
+    let _startTime = 0;
+    let _totalTimeClocked = 0;
+    let _refresh = null;
+    
     // public methods
     this.start = function(){
         if(!_isRunning){
             _isRunning = true;
-            _startTime = new Date();
-            _startTime = _startTime.valueOf();
+            _startTime = new Date().valueOf();
+            _refresh = setInterval(displayCurrentTime, 10);
         }else{
             feedbackArea.innerText = 'Stopwatch has arleady been started.';
             feedbackArea.style.display = 'block';
@@ -51,11 +54,9 @@ function Stopwatch(){
     this.stop = function(){
         if(_isRunning){
             _isRunning = false;
-            _stopTime = new Date();
-            _stopTime = _stopTime.valueOf();
-            _timeElapsed = _stopTime - _startTime;
-            _totalTimeElapsed += _timeElapsed;
-            calculateTimeAndDisplayFormatted(_totalTimeElapsed);
+            let stopTime = new Date().valueOf();
+            _totalTimeClocked = _totalTimeClocked + stopTime - _startTime;
+            clearInterval(_refresh);
         }else{
             feedbackArea.innerText = 'Stopwatch has arleady been stopped.';
             feedbackArea.style.display = 'block';
@@ -66,10 +67,8 @@ function Stopwatch(){
         if(!_isRunning){
             _isRunning = false;
             _startTime = null;
-            _stopTime = null;
-            _timeElapsed = 0;
-            _totalTimeElapsed = 0;
-            calculateTimeAndDisplayFormatted(_totalTimeElapsed);
+            _totalTimeClocked = 0;
+            timeArea.innerText = '00 : 00 : 00 : 00';
         }else{
             feedbackArea.innerText = 'Stopwatch has to be stopped in order to reset.';
             feedbackArea.style.display = 'block';
@@ -77,22 +76,29 @@ function Stopwatch(){
     }
 
     // private methods
-    let calculateTimeAndDisplayFormatted = function(totalMilliseconds){
-        let millisecondsRemaining = totalMilliseconds % 1000;
-        let seconds = Math.floor(totalMilliseconds / 1000);
-        let secondsRemaining = seconds % 60;
-        let minutes = Math.floor(seconds / 60);
-        timeArea.innerText = leftFillZeros(2, minutes.toString()) + " : " + leftFillZeros(2, secondsRemaining.toString()) + " : " + leftFillZeros(3, millisecondsRemaining.toString());
+    let displayCurrentTime = function(){
+        let currentTime = new Date().valueOf();
+        let calculatedTime = (currentTime - _startTime) + _totalTimeClocked;
+        timeArea.innerText = formatTimeAmount(calculatedTime);
+    }
+
+    let formatTimeAmount = function(totalMilliseconds){
+        let milliseconds = Math.floor((totalMilliseconds % 1000) / 10);
+        let totalSeconds = Math.floor(totalMilliseconds / 1000);
+        let seconds = totalSeconds % 60;
+        let totalMinutes = Math.floor(totalSeconds / 60);
+        let minutes = totalMinutes % 60;
+        let totalHours = Math.floor(totalMinutes / 60);
+        let hours = totalHours % 24;
+        
+        return leftFillZeros(2, hours.toString()) + ' : ' + leftFillZeros(2, minutes.toString()) + ' : ' + leftFillZeros(2, seconds.toString()) + ' : ' + leftFillZeros(2, milliseconds.toString())
     }
 }
 
-// Global utility functions
-function leftFillZeros(maxLength, str){
-    while(str.length < maxLength){
-        str = "0" + str;
+// global utility functions
+function leftFillZeros(lengthDesired, aString){
+    while(aString.length < lengthDesired){
+        aString = '0' + aString;
     }
-    return str;
+    return aString;
 }
-
-
-
