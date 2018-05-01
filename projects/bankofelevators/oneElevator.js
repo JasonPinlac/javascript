@@ -1,7 +1,48 @@
 // Classes
 function Dispatcher(){
+
     this.queue = [];
     this.elevators = [];
+
+    this.assignJob = function(){
+        
+        let timeStamp = '(' +new Date().toTimeString().substring(0,8) + ')';
+
+        if(this.queue.length > 0){
+
+            // iterate through all jobs in the queue and hand off any if possible
+            for(let i = 0; i < this.queue.length; i++){
+
+                let job = this.queue[i];
+
+                // checkout each elevator one at a time to see if it can take the job
+                for(let j  = 0; j < this.elevators.length; j++){
+                    
+                    // Dispatcher hands out a job to an elevator if its idle or currently moving the same direction and hasn't missed the floor yet
+                    let elevator = this.elevators[j];
+
+                    if (elevator.isIdle){
+                        dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
+                        elevator.queue.push(job);
+                        this.queue.splice(i,1);
+                        break;
+                    }
+                    else if (!elevator.isIdle && job.direction === 'up' && elevator.direction === job.direction && elevator.currentFloor <= job.pickUpFloorNumber){
+                        dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
+                        elevator.queue.push(job);
+                        this.queue.splice(i,1);
+                        break;
+                    }
+                    else if (!elevator.isIdle && job.direction === 'down' && elevator.direction === job.direction && elevator.currentFloor >= job.pickUpFloorNumber){
+                        dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
+                        elevator.queue.push(job);
+                        this.queue.splice(i,1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 function Elevator(name){
@@ -11,6 +52,96 @@ function Elevator(name){
     this.currentFloor = 1;
     this.destinationFloors = [];
     this.direction = 'up';
+
+    this.startJob = function(){
+        let timeStamp = '(' +new Date().toTimeString().substring(0,8) + ')';
+        // if idle pick up a job from the queue
+        if(this.isIdle && this.queue.length > 0){
+            let job = this.queue.shift();
+            this.isIdle = false;
+            this.direction = job.direction;
+            this.destinationFloors.push(job.pickUpFloorNumber);
+            this.destinationFloors.push(job.destinationFloorNumber);
+            elevatorLog.innerText += 'Elevator ' + this.name + ' has started job [' + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + ']. ' + timeStamp + '\n';
+        }
+    }
+
+    this.adjustFloorDestinations = function(){
+
+        if(!this.isIdle && this.queue.length > 0){
+            
+            let timeStamp = '(' +new Date().toTimeString().substring(0,8) + ')';
+            let hasBeenAdjusted = false;
+
+            // iterate through all jobs in the elevator queue
+            for(let index = 0; index < this.queue.length; index++){
+
+                let job = this.queue[index];
+                
+
+                // check if this job is compatible meaning the current floor hasnt passed the pickup floor
+                if(this.direction === 'up' && this.currentFloor <= job.pickUpFloorNumber){
+                    this.destinationFloors.push(job.pickUpFloorNumber);
+                    this.destinationFloors.push(job.destinationFloorNumber);
+                    this.queue.splice(index, 1);
+                    hasBeenAdjusted = true;
+                } 
+                else if(this.direction === 'down' && this.currentFloor >= job.pickUpFloorNumber){
+                    this.destinationFloors.push(job.pickUpFloorNumber);
+                    this.destinationFloors.push(job.destinationFloorNumber);
+                    this.queue.splice(index, 1);
+                    hasBeenAdjusted = true;
+                }
+            }
+
+            if(this.destinationFloors.length > 0 && hasBeenAdjusted){
+                // remove all duplicate floors
+                this.destinationFloors = removeDuplicates(this.destinationFloors);
+                
+                // re-adjust order of destination floors by sorting low to high (up direction) or high to low (down direction) 
+                if(this.direction === 'up')
+                {
+                    this.destinationFloors.sort(lowToHigh);
+                }
+                else if(this.direction === 'down')
+                {
+                    this.destinationFloors.sort(highToLow);
+                }
+                elevatorLog.innerText += 'Elevator ' + this.name + " has adjusted it's destinationFloors [ " + this.destinationFloors.toString() + ' ] to this order.' + timeStamp + '\n';
+            }
+        }
+    }
+
+    this.move = function(){
+        
+        
+        // if not idle it must have a have a job, move the elevator to jobAtHand.destinationFloors[0]
+        if (!this.isIdle && this.destinationFloors.length > 0){
+            // sort destinationFloors based on elevator direction. If going up sort smallest to largest. If going down sort largest to smallest.
+
+            // check to see if the elevator has any jobs in its queue that we can complete while going up to its jobAtHand.destination
+
+            //if the elevator.currentFloor reaches(===) the elevator.jobAtHand.destinationFloor then set the elevator to idle and reset any properties necessary i.E job at hand.
+        }
+    }
+
+    let lowToHigh = function(a, b){
+        return a - b;
+    }
+
+    let highToLow = function(a, b){
+        return b - a;
+    }
+
+    let removeDuplicates = function(arr){
+        let uniqueArray = [];
+        for(let i = 0;i < arr.length; i++){
+            if(uniqueArray.indexOf(arr[i]) == -1){
+                uniqueArray.push(arr[i])
+            }
+        }
+        return uniqueArray;
+    }
 }
 
 function Job(direction, pickUpFloorNumber, destinationFloorNumber){
@@ -1009,87 +1140,22 @@ button1.addEventListener('click', function(){
 let refresher = setInterval(dispatchJobMoveElevatorsAndRefreshTheUI, 1000);
 
 function dispatchJobMoveElevatorsAndRefreshTheUI(){
-   let timeStamp = '(' +new Date().toTimeString().substring(0,8) + ')';
-
-
-    // UI
-    // Refresh the dispatcher queue
-    let stringOfQueuedUpJobs = '';
-    for(let index  = 0; index < TheDispatcher.queue.length; index++){
-        let job = TheDispatcher.queue[index];
-        stringOfQueuedUpJobs += ' [' + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '],';
-    }
-    dispatcherQueue.innerText = stringOfQueuedUpJobs.substring(0, stringOfQueuedUpJobs.length-1);
-
-
-
-
-    //DISPATCHER
-    // Dispatcher hands out a job to elevator going the same direction or elevator that is idle.
-    if(TheDispatcher.queue.length > 0){
-        let job = TheDispatcher.queue[0];
-        // checkout each elevator one at a time to see if it can take the job.
-        for(let index  = 0; index < TheDispatcher.elevators.length; index++){
-            
-            let elevator = TheDispatcher.elevators[index];
-
-            if(!elevator.isIdle && job.direction === 'up' && elevator.direction === job.direction && elevator.currentFloor <= job.pickUpFloorNumber){
-                dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
-                elevator.queue.push(TheDispatcher.queue.shift());
-                break;
-            }
-            else if (!elevator.isIdle && job.direction === 'down' && elevator.direction === job.direction && elevator.currentFloor >= job.pickUpFloorNumber){
-                dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
-                elevator.queue.push(TheDispatcher.queue.shift());
-                break;
-            }
-            else if (elevator.isIdle){
-                dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
-                elevator.queue.push(TheDispatcher.queue.shift());
-                break;
-            }
-        }
-    }
-
-    // TODO: BEFORE WE MOVE THE ELEVATORS, WE FIRST HAVE TO GO THROUGH THERE QUEUES AND TAKE ANY JOBS AND PUT THEM INTO THEY DESTINATIONFLOORS ARRAY AND THEN SORT THE ARRAYS. IF GOING UP SMALL TO LARGEST IF GOING DOWN LARGEST TO SMALLEST.
-
-    // ELEVATORS
-    // Move elevators
-    for(let index = 0; index < TheDispatcher.elevators.length; index++){
-        
+   TheDispatcher.assignJob();
+   for(let index = 0; index < TheDispatcher.elevators.length; index++){
         let elevator = TheDispatcher.elevators[index];
+        elevator.startJob();
+        elevator.adjustFloorDestinations();
+        elevator.move();
+   }
+   updateTheUI();
+}
 
-
-        // if idle pick up a job from the queue to start moving on the next refresh
-        if(elevator.isIdle && elevator.queue.length > 0){
-            let job = elevator.queue.shift();
-            elevator.isIdle = false;
-            elevator.direction = job.direction;
-            elevator.destinationFloors.push(job.pickUpFloorNumber);
-            elevator.destinationFloors.push(job.destinationFloorNumber);
-            elevatorLog.innerText = 'Elevator ' + elevator.name + ' is has picked up [' + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + ']. ' + timeStamp + '\n';
-        }
-        // if not idle it must have a have a job, move the elevator to jobAtHand.destinationFloors[0]
-        else if (!elevator.isIdle && elevator.destinationFloors.length > 0){
-            // sort destinationFloors based on elevator direction. If going up sort smallest to largest. If going down sort largest to smallest.
-
-            // check to see if the elevator has any jobs in its queue that we can complete while going up to its jobAtHand.destination
-
-            //if the elevator.currentFloor reaches(===) the elevator.jobAtHand.destinationFloor then set the elevator to idle and reset any properties necessary i.E job at hand.
-        }
-
-        
-    }
-
-
-
-
-    
-
-    
-    
-
-
-    
-    
+function updateTheUI(){
+     // Refresh the dispatcher queue
+     let stringOfQueuedUpJobs = '';
+     for(let index  = 0; index < TheDispatcher.queue.length; index++){
+         let job = TheDispatcher.queue[index];
+         stringOfQueuedUpJobs += ' [' + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '],';
+     }
+     dispatcherQueue.innerText = stringOfQueuedUpJobs.substring(0, stringOfQueuedUpJobs.length-1);
 }
