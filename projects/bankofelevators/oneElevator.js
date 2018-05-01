@@ -11,7 +11,6 @@ function Dispatcher(){
 
             // iterate through all jobs in the queue and hand off any if possible
             for(let i = 0; i < this.queue.length; i++){
-
                 let job = this.queue[i];
 
                 // checkout each elevator one at a time to see if it can take the job
@@ -24,18 +23,21 @@ function Dispatcher(){
                         dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
                         elevator.queue.push(job);
                         this.queue.splice(i,1);
+						i--;
                         break;
                     }
                     else if (!elevator.isIdle && job.direction === 'up' && elevator.direction === job.direction && elevator.currentFloor <= job.pickUpFloorNumber){
                         dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
                         elevator.queue.push(job);
                         this.queue.splice(i,1);
+						i--;
                         break;
                     }
                     else if (!elevator.isIdle && job.direction === 'down' && elevator.direction === job.direction && elevator.currentFloor >= job.pickUpFloorNumber){
                         dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
                         elevator.queue.push(job);
                         this.queue.splice(i,1);
+						i--;
                         break;
                     }
                 }
