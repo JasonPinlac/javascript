@@ -6,34 +6,49 @@ function Dispatcher(){
     this.assignJob = function(){
         
         let timeStamp = '(' +new Date().toTimeString().substring(0,8) + ')';
-
+        
         if(this.queue.length > 0){
 
             // iterate through all jobs in the queue and hand off any if possible
             for(let i = 0; i < this.queue.length; i++){
                 let job = this.queue[i];
+                let isJobAssigned = false
 
                 // checkout each elevator one at a time to see if it can take the job
-                for(let j  = 0; j < this.elevators.length; j++){
-                    
-                    // Dispatcher hands out a job to an elevator if its idle or currently moving the same direction and hasn't missed the floor yet
+                // an idle elevator takes priority
+                for(let j = 0; j < this.elevators.length; j++){
                     let elevator = this.elevators[j];
+                    if (elevator.destinationFloors.length === 0){
+                        dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
+                        elevator.queue.push(job);
+                        isJobAssigned = true;
+                        this.queue.splice(i,1); // queue length will be -1. jobs will shift over and for loop condition is affected. We decrement i-- to account for this side effect of splicing.
+                        i--;
+                        break;
+                    }
+                }
 
-                    if (elevator.isIdle){
+                if(isJobAssigned){
+                    continue;
+                }
+
+                // if there are no idle elevators to pick up the job checkout each elevator one at a time to see if it can take the job
+                for(let j  = 0; j < this.elevators.length; j++){
+                    console.log('rawr');
+                    // Dispatcher hands out a job to an elevator currently moving the same direction and hasn't missed the floor yet
+                    let elevator = this.elevators[j];
+                    
+                    // get the elevators min or max floor depending on the direction its currently heading. This is the last index in its current destinationFloors
+                    let floorLimit = elevator.destinationFloors[destinationFloors.length-1];
+
+                    if (!elevator.isIdle && job.direction === 'up' && elevator.direction === job.direction && elevator.currentFloor <= job.pickUpFloorNumber && job.pickUpFloorNumber <= floorLimit){
                         dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
                         elevator.queue.push(job);
                         this.queue.splice(i,1); // queue length will be -1. jobs will shift over and for loop condition is affected. We decrement i-- to account for this side effect of splicing.
 						i--;
                         break;
                     }
-                    else if (!elevator.isIdle && job.direction === 'up' && elevator.direction === job.direction && elevator.currentFloor <= job.pickUpFloorNumber){
-                        dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
-                        elevator.queue.push(job);
-                        this.queue.splice(i,1); // queue length will be -1. jobs will shift over and for loop condition is affected. We decrement i-- to account for this side effect of splicing.
-						i--;
-                        break;
-                    }
-                    else if (!elevator.isIdle && job.direction === 'down' && elevator.direction === job.direction && elevator.currentFloor >= job.pickUpFloorNumber){
+                    else if (!elevator.isIdle && job.direction === 'down' && elevator.direction === job.direction && elevator.currentFloor >= job.pickUpFloorNumber && job.pickUpFloorNumber >= floorLimit){
                         dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + timeStamp + '\n';
                         elevator.queue.push(job);
                         this.queue.splice(i,1); // queue length will be -1. jobs will shift over and for loop condition is affected. We decrement i-- to account for this side effect of splicing.
@@ -1152,10 +1167,11 @@ button1.addEventListener('click', function(){
     TheDispatcher.queue.push(new Job(Direction, PickUpFloorNumber, 1));
 });
 
-let refresher = setInterval(dispatchJobMoveElevatorsAndRefreshTheUI, 3000);
+let dispatchJobMoveElevatorsInterval = setInterval(dispatchJobMoveElevators, 3000);
+let updateTheUIInterval = setInterval(updateTheUI, 100);
 
-function dispatchJobMoveElevatorsAndRefreshTheUI(){
-    updateTheUI();
+function dispatchJobMoveElevators(){
+
     TheDispatcher.assignJob();
     for(let index = 0; index < TheDispatcher.elevators.length; index++){
         let elevator = TheDispatcher.elevators[index];
