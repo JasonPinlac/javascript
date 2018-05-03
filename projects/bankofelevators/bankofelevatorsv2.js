@@ -7,7 +7,7 @@ function Dispatcher(){
         
         if(this.queue.length > 0){
 
-            //TODO: REMOVE DUPLICATE JOBS
+            this.queue = removeDuplicateJobs(this.queue);
 
             // iterate through all jobs in the queue and hand off any if possible
             for(let i = 0; i < this.queue.length; i++){
@@ -18,7 +18,8 @@ function Dispatcher(){
                 // an idle elevator takes priority
                 for(let j = 0; j < this.elevators.length; j++){
                     let elevator = this.elevators[j];
-                    if (elevator.destinationFloors.length === 0){
+                    if (elevator.isIdle)//elevator.destinationFloors.length === 0)
+                    {
                         dispatcherLog.innerText += "The dispatcher hands off job [" + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '] to elevator ' + elevator.name + '. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
                         elevator.queue.push(job);
                         elevator.startJob();
@@ -59,6 +60,23 @@ function Dispatcher(){
             }
         }
     }
+
+    let removeDuplicateJobs = function(arr){
+        let uniqueArrString = [];
+        let uniqueArrObj = []
+        // stringify objects of the dispatcher queue and if duplicate don't insert into uniqueArray
+        for(let i = 0; i < arr.length; i++){
+            let currentToString = JSON.stringify(arr[i]);
+            if(uniqueArrString.indexOf(currentToString) < 0){
+                uniqueArrString.push(currentToString);
+            }
+        }
+        // convert uniqueArray strings back to objects
+        for(let j = 0; j < uniqueArrString.length; j++){
+            uniqueArrObj.push(JSON.parse(uniqueArrString[j]));
+        }
+        return uniqueArrObj;
+    }
 }
 
 function Elevator(name){
@@ -66,6 +84,7 @@ function Elevator(name){
     this.isIdle = true;
     this.queue = [];
     this.currentFloor = 1;
+    this.targetFloor = 0;
     this.destinationFloors = [];
     this.direction = 'up';
 
@@ -93,19 +112,20 @@ function Elevator(name){
 
                 let job = this.queue[index];
                 
-
                 // check if this job is compatible meaning the current floor hasnt passed the pickup floor
                 if(this.direction === 'up' && this.currentFloor <= job.pickUpFloorNumber){
                     this.destinationFloors.push(job.pickUpFloorNumber);
                     this.destinationFloors.push(job.destinationFloorNumber);
                     this.queue.splice(index, 1);
                     hasBeenAdjusted = true;
+                    elevatorLog.innerText += 'Elevator ' + this.name + ' has queued up a new job [' + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + ']. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
                 } 
                 else if(this.direction === 'down' && this.currentFloor >= job.pickUpFloorNumber){
                     this.destinationFloors.push(job.pickUpFloorNumber);
                     this.destinationFloors.push(job.destinationFloorNumber);
                     this.queue.splice(index, 1);
                     hasBeenAdjusted = true;
+                    elevatorLog.innerText += 'Elevator ' + this.name + ' has queued up a new job [' + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + ']. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
                 }
             }
 
@@ -127,6 +147,35 @@ function Elevator(name){
         }
     }
 
+    this.realTimeMove = function(){
+
+        if(this.targetFloor === 0){
+            this.targetFloor = this.destinationFloors.shift();
+        }
+
+        if(!this.isIdle && this.currentFloor < this.targetFloor){
+            this.currentFloor++;
+            elevatorLog.innerText += 'Elevator ' + this.name + ' has moved up to floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+        }
+        else if(!this.isIdle && this.currentFloor > this.targetFloor){
+            this.currentFloor--;
+            elevatorLog.innerText += 'Elevator ' + this.name + ' has moved down to floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+        }
+        else if (!this.isIdle && this.currentFloor === this.targetFloor){
+
+            if(this.destinationFloors.length === 0)
+            {
+                this.isIdle = true;
+                elevatorLog.innerText += 'Elevator ' + this.name + ' has opened on its final floor destination ' + this.currentFloor + '. It is now idle. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+            }
+            else
+            {
+                this.targetFloor = this.destinationFloors.shift();
+                elevatorLog.innerText += 'Elevator ' + this.name + ' has opened on floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+            }
+        }
+    }
+
     this.move = function(){
         // if not idle it must have a have a job, move the elevator
         if (!this.isIdle && this.destinationFloors.length > 0){
@@ -140,11 +189,11 @@ function Elevator(name){
             if((this.direction === 'up' && this.currentFloor === 10) || this.destinationFloors.length === 0)
             {
                 this.isIdle = true;
-                elevatorLog.innerText += 'Elevator a ' + this.name + ' has completed reached its final floor destination ' + this.currentFloor + '. It is now idle. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+                elevatorLog.innerText += 'Elevator ' + this.name + ' has reached its final floor destination ' + this.currentFloor + '. It is now idle. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
             }
             else if((this.direction === 'down' && this.currentFloor === 1) || this.destinationFloors.length === 0){
                 this.isIdle = true;
-                elevatorLog.innerText += 'Elevator b' + this.name + ' has completed reached its final floor destination ' + this.currentFloor + '. It is now idle. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+                elevatorLog.innerText += 'Elevator ' + this.name + ' has reached its final floor destination ' + this.currentFloor + '. It is now idle. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
             }
         }
     }
@@ -1163,7 +1212,7 @@ button1.addEventListener('click', function(){
     TheDispatcher.queue.push(new Job(Direction, PickUpFloorNumber, 1));
 });
 
-let dispatchJobMoveElevatorsInterval = setInterval(dispatchJobMoveElevators, 5000);
+let dispatchJobMoveElevatorsInterval = setInterval(dispatchJobMoveElevators, 3000);
 let updateTheUIInterval = setInterval(updateTheUI, 100);
 
 function dispatchJobMoveElevators(){
@@ -1171,14 +1220,14 @@ function dispatchJobMoveElevators(){
     TheDispatcher.assignJobs();
     for(let index = 0; index < TheDispatcher.elevators.length; index++){
         let elevator = TheDispatcher.elevators[index];
-        //elevator.startJob();
         elevator.adjustFloorDestinations();
         elevator.move();
+        //elevator.realTimeMove();
     }
-    
 }
 
 function updateTheUI(){
+
      // Refresh the dispatcher queue
      let stringOfQueuedUpJobs = '';
      for(let index  = 0; index < TheDispatcher.queue.length; index++){
@@ -1186,4 +1235,18 @@ function updateTheUI(){
          stringOfQueuedUpJobs += ' [' + job.pickUpFloorNumber.toString() + ' to ' + job.destinationFloorNumber.toString() + '],';
      }
      dispatcherQueue.innerText = stringOfQueuedUpJobs.substring(0, stringOfQueuedUpJobs.length-1);
+
+    // Refresh the elevator UI
+    if(TheDispatcher.elevators[0].currentFloor === 10 && TheDispatcher.elevators[1].currentFloor === 10 && TheDispatcher.elevators[2].currentFloor === 10){
+        tenthFloor.innerText = '10th floor  |__|A|__|__|B|__|__|C|__|';
+        ninthFloor.innerText = '9th floor  |_______|_______|_______|';
+        eithFloor.innerText = '8th floor  |_______|_______|_______|';
+        seventhFloor.innerText = '7th floor  |_______|_______|_______|';
+        sixthFloor.innerText = '6th floor  |_______|_______|_______|';
+        fifthFloor.innerHTML = ' 5th floor  |_______|_______|_______|';
+        fourthFloor.innerText = '4th floor  |_______|_______|_______|';
+        thirdFloor.innerText = '3th floor  |_______|_______|_______|';
+        secondFloor.innerText = '2nd floor  |_______|_______|_______|';
+        firstFloor.innerText = '1st floor  |_______|_______|_______|';
+    }
 }
