@@ -147,34 +147,35 @@ function Elevator(name){
         }
     }
 
-    this.realTimeMove = function(){
+    // this.realTimeMove = function(){
 
-        if(this.targetFloor === 0){
-            this.targetFloor = this.destinationFloors.shift();
-        }
+    //     if(this.targetFloor === 0){
+    //         this.targetFloor = this.destinationFloors.shift();
+    //     }
 
-        if(!this.isIdle && this.currentFloor < this.targetFloor){
-            this.currentFloor++;
-            elevatorLog.innerText += 'Elevator ' + this.name + ' has moved up to floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
-        }
-        else if(!this.isIdle && this.currentFloor > this.targetFloor){
-            this.currentFloor--;
-            elevatorLog.innerText += 'Elevator ' + this.name + ' has moved down to floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
-        }
-        else if (!this.isIdle && this.currentFloor === this.targetFloor){
+    //     if(!this.isIdle && this.currentFloor < this.targetFloor){
+    //         this.currentFloor++;
+    //         elevatorLog.innerText += 'Elevator ' + this.name + ' has moved up to floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+    //     }
+    //     else if(!this.isIdle && this.currentFloor > this.targetFloor){
+    //         this.currentFloor--;
+    //         elevatorLog.innerText += 'Elevator ' + this.name + ' has moved down to floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+    //     }
+    //     else if (!this.isIdle && this.currentFloor === this.targetFloor){
 
-            if(this.destinationFloors.length === 0)
-            {
-                this.isIdle = true;
-                elevatorLog.innerText += 'Elevator ' + this.name + ' has opened on its final floor destination ' + this.currentFloor + '. It is now idle. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
-            }
-            else
-            {
-                this.targetFloor = this.destinationFloors.shift();
-                elevatorLog.innerText += 'Elevator ' + this.name + ' has opened on floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
-            }
-        }
-    }
+    //         if(this.destinationFloors.length === 0)
+    //         {
+    //             this.isIdle = true;
+    //             this.targetFloor = 0;
+    //             elevatorLog.innerText += 'Elevator ' + this.name + ' has opened on its final floor destination ' + this.currentFloor + '. It is now idle. ' + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+    //         }
+    //         else
+    //         {
+    //             this.targetFloor = this.destinationFloors.shift();
+    //             elevatorLog.innerText += 'Elevator ' + this.name + ' has opened on floor ' + this.currentFloor + ". " + '(' +new Date().toTimeString().substring(0,8) + ')' + '\n';
+    //         }
+    //     }
+    // }
 
     this.move = function(){
         // if not idle it must have a have a job, move the elevator
@@ -228,16 +229,38 @@ let dispatcherQueue = document.getElementById('dispatcher-queue');
 let dispatcherLog = document.getElementById('dispatcher-log');
 let elevatorLog = document.getElementById('elevator-log');
 
-let tenthFloor = document.getElementById('tenth-floor');
-let ninthFloor = document.getElementById('ninth-floor');
-let eithFloor = document.getElementById('eith-floor');
-let seventhFloor = document.getElementById('seventh-floor');
-let sixthFloor = document.getElementById('sixth-floor');
-let fifthFloor = document.getElementById('fifth-floor');
-let fourthFloor = document.getElementById('fourth-floor');
-let thirdFloor = document.getElementById('third-floor');
-let secondFloor = document.getElementById('second-floor');
-let firstFloor = document.getElementById('first-floor');
+let tenthFloorA = document.getElementById('tenth-floor-A');
+let ninthFloorA = document.getElementById('ninth-floor-A');
+let eighthFloorA = document.getElementById('eighth-floor-A');
+let seventhFloorA = document.getElementById('seventh-floor-A');
+let sixthFloorA = document.getElementById('sixth-floor-A');
+let fifthFloorA = document.getElementById('fifth-floor-A');
+let fourthFloorA = document.getElementById('fourth-floor-A');
+let thirdFloorA = document.getElementById('third-floor-A');
+let secondFloorA = document.getElementById('second-floor-A');
+let firstFloorA = document.getElementById('first-floor-A');
+
+let tenthFloorB = document.getElementById('tenth-floor-B');
+let ninthFloorB = document.getElementById('ninth-floor-B');
+let eighthFloorB = document.getElementById('eighth-floor-B');
+let seventhFloorB = document.getElementById('seventh-floor-B');
+let sixthFloorB = document.getElementById('sixth-floor-B');
+let fifthFloorB = document.getElementById('fifth-floor-B');
+let fourthFloorB = document.getElementById('fourth-floor-B');
+let thirdFloorB = document.getElementById('third-floor-B');
+let secondFloorB = document.getElementById('second-floor-B');
+let firstFloorB = document.getElementById('first-floor-B');
+
+let tenthFloorC = document.getElementById('tenth-floor-C');
+let ninthFloorC = document.getElementById('ninth-floor-C');
+let eighthFloorC = document.getElementById('eighth-floor-C');
+let seventhFloorC = document.getElementById('seventh-floor-C');
+let sixthFloorC = document.getElementById('sixth-floor-C');
+let fifthFloorC = document.getElementById('fifth-floor-C');
+let fourthFloorC = document.getElementById('fourth-floor-C');
+let thirdFloorC = document.getElementById('third-floor-C');
+let secondFloorC = document.getElementById('second-floor-C');
+let firstFloorC = document.getElementById('first-floor-C');
 
 let button10 = document.getElementById('button-10');
 let button9 = document.getElementById('button-9');
@@ -571,6 +594,7 @@ downButton2.addEventListener('click', function(){
     Direction = 'down';
     PickUpFloorNumber = 2;
 });
+
 upButton9.addEventListener('click', function(){
     // Hide all direction buttons
     downButton10.style.display = 'none';
@@ -1237,16 +1261,366 @@ function updateTheUI(){
      dispatcherQueue.innerText = stringOfQueuedUpJobs.substring(0, stringOfQueuedUpJobs.length-1);
 
     // Refresh the elevator UI
-    if(TheDispatcher.elevators[0].currentFloor === 10 && TheDispatcher.elevators[1].currentFloor === 10 && TheDispatcher.elevators[2].currentFloor === 10){
-        tenthFloor.innerText = '10th floor  |__|A|__|__|B|__|__|C|__|';
-        ninthFloor.innerText = '9th floor  |_______|_______|_______|';
-        eithFloor.innerText = '8th floor  |_______|_______|_______|';
-        seventhFloor.innerText = '7th floor  |_______|_______|_______|';
-        sixthFloor.innerText = '6th floor  |_______|_______|_______|';
-        fifthFloor.innerHTML = ' 5th floor  |_______|_______|_______|';
-        fourthFloor.innerText = '4th floor  |_______|_______|_______|';
-        thirdFloor.innerText = '3th floor  |_______|_______|_______|';
-        secondFloor.innerText = '2nd floor  |_______|_______|_______|';
-        firstFloor.innerText = '1st floor  |_______|_______|_______|';
+    if(TheDispatcher.elevators[0].currentFloor === 10){
+        tenthFloorA.innerText = '|__|A|__| ';
+        ninthFloorA.innerText = '|_______| ';
+        eighthFloorA.innerText = '|_______| ';
+        seventhFloorA.innerText = '|_______| ';
+        sixthFloorA.innerText = '|_______| ';
+        fifthFloorA.innerText = '|_______| ';
+        fourthFloorA.innerText = '|_______| ';
+        thirdFloorA.innerText = '|_______| ';
+        secondFloorA.innerText = '|_______| ';
+        firstFloorA.innerText = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 9){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|__|A|__| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 8){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|__|A|__| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 7){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|__|A|__| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 6){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|__|A|__| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 5){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|__|A|__| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 4){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|__|A|__| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 3){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|__|A|__| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 2){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|__|A|__| ';
+        firstFloorA.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[0].currentFloor === 1){
+        tenthFloorA.textContent = '|_______| ';
+        ninthFloorA.textContent = '|_______| ';
+        eighthFloorA.textContent = '|_______| ';
+        seventhFloorA.textContent = '|_______| ';
+        sixthFloorA.textContent = '|_______| ';
+        fifthFloorA.textContent = '|_______| ';
+        fourthFloorA.textContent = '|_______| ';
+        thirdFloorA.textContent = '|_______| ';
+        secondFloorA.textContent = '|_______| ';
+        firstFloorA.textContent = '|__|A|__| ';
+    }
+
+    if(TheDispatcher.elevators[1].currentFloor === 10){
+        tenthFloorB.textContent = '|__|B|__| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 9){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|__|B|__| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 8){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|__|B|__| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 7){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|__|B|__| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 6){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|__|B|__| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 5){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|__|B|__| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 4){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|__|B|__| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 3){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|__|B|__| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 2){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|__|B|__| ';
+        firstFloorB.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[1].currentFloor === 1){
+        tenthFloorB.textContent = '|_______| ';
+        ninthFloorB.textContent = '|_______| ';
+        eighthFloorB.textContent = '|_______| ';
+        seventhFloorB.textContent = '|_______| ';
+        sixthFloorB.textContent = '|_______| ';
+        fifthFloorB.textContent = '|_______| ';
+        fourthFloorB.textContent = '|_______| ';
+        thirdFloorB.textContent = '|_______| ';
+        secondFloorB.textContent = '|_______| ';
+        firstFloorB.textContent = '|__|B|__| ';
+    }
+
+    if(TheDispatcher.elevators[2].currentFloor === 10){
+        tenthFloorC.textContent = '|__|C|__| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 9){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|__|C|__| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 8){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|__|C|__| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 7){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|__|C|__| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 6){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|__|C|__| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 5){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|__|C|__| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 4){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|__|C|__| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 3){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|__|C|__| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 2){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|__|C|__| ';
+        firstFloorC.textContent = '|_______| ';
+    }
+    else if(TheDispatcher.elevators[2].currentFloor === 1){
+        tenthFloorC.textContent = '|_______| ';
+        ninthFloorC.textContent = '|_______| ';
+        eighthFloorC.textContent = '|_______| ';
+        seventhFloorC.textContent = '|_______| ';
+        sixthFloorC.textContent = '|_______| ';
+        fifthFloorC.textContent = '|_______| ';
+        fourthFloorC.textContent = '|_______| ';
+        thirdFloorC.textContent = '|_______| ';
+        secondFloorC.textContent = '|_______| ';
+        firstFloorC.textContent = '|__|C|__| ';
     }
 }
