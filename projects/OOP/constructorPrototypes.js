@@ -27,3 +27,6 @@ let constructorCircle = new Circle(5);
 
 console.log(functionCircle);
 console.log(constructorCircle)
+
+console.log(functionCircle.constructor);
+console.log(constructorCircle.constructor);
