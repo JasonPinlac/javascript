@@ -6,6 +6,7 @@ function Person(name, a){
     let age = a;
 }
 
+// the prototype object has access to the child objects members and vise-versa
 Person.prototype.speak = function(){
     console.log('Hi my name is ' + this.name + ' and I am ' + age + ' years old.');
 };
