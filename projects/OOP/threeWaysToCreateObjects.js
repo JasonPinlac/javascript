@@ -1,6 +1,14 @@
 /*jslint es6 */
 'use strict';
 
+// Object literal syntax
+let firstCirle = {
+    radius: 10,
+    draw: function(){
+        console.log('draw');
+    }
+}
+
 // Factory function
 function createCircle(radius, location){
     return {
@@ -12,12 +20,12 @@ function createCircle(radius, location){
     };
 }
 
-// Prototype Constructor
+// Constructor function
 function Location(x, y) {
     this.x = x;
     this.y = y;
 }
-// Prototype Constructor
+// Constructor function
 function Circle(radius, location) {
     this.radius = radius;
     this.location = location;
